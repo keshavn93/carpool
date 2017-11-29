@@ -36,10 +36,10 @@ def delPickUpFromPool(lat,lng,key,treeOfCities,dictMap):
 	for datum,dist in arr:
 		l1,l2,data=datum.data
 		localTree=dictMap[data]['pick_up']
-		localTree.remove((lat,lng,key))
+		localTree._remove((lat,lng,key))
 		#to update the hashMap
 		trees=dictMap[data]
-		trees[0]=localTree
+		trees['pickup']=localTree
 		dictMap[data]=trees
 
 def addDestToPool(lat,lng,key,treeOfCities,dictMap):
@@ -64,9 +64,8 @@ def delDestFromPool(lat,lng,key,treeOfCities,dictMap):
 	arr=treeOfCities.search_knn((float(lat),float(lng),int(geoCode.getSubLocality(lat,lng))),2)#returns array of size 2 having nodes of type item
 	for datum,dist in arr:
 		l1,l2,data=datum.data
-		key=elt.data
 		localTree=dictMap[data]['dest']
-		localTree.add((lat,lng,key))
+		localTree._remove((lat,lng,key))
 		#to update the hashMap
 		trees=dictMap[data]
 		trees['dest']=localTree
@@ -109,9 +108,15 @@ def getFromPool(lat1,lng1,lat2,lng2,treeOfCities,dictMap):
 				if(d1==d2):
 					if d1 in listofKeys:
 						continue;
-					ans.append( {'pickup':vals.data,'dest':destVals.data,'total_distance':(c+e)})
+					ans.append( {'pickup':vals.data,'dest':destVals.data,'total_distance':(c+e),'key':d1})
 					listofKeys.append(d1)
-	return {'results':json.dumps(ans)}
+	mindist=0;
+	min=None;
+	for elts in ans:
+		if(elts["total_distance"]>mindist):
+			min=elts
+			mindist=elts["total_distance"]
+	return min
 
 
 

@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import kdtree
 import pool
 import json
+import sms
 treeOfCities=kdtree.create(dimensions=3);
 dictMap={}
 app = Flask(__name__)
@@ -15,15 +16,15 @@ def addToPool():
 	pool.addPickUpToPool(pickupLat,pickupLng,key,treeOfCities,dictMap)
 	pool.addDestToPool(DestLat,DestLng,key,treeOfCities,dictMap)
 	return "Successful"
-@app.route('/api/reCaP/v1/consumer/<int:id>',methods=['DELETE'])
+@app.route('/api/reCaP/v1/consumer/<id>',methods=['DELETE'])
 def delFromPool(id):
 	pickupLat=request.json["PickUp"]["Latitude"];
 	pickupLng=request.json["PickUp"]["Longitude"];
 	destLat=request.json["Destination"]["Latitude"];
 	destLng=request.json["Destination"]["Longitude"];
-	pool.delPickUpFromPool(pickupLat,pickupLng,id,treeOfCities,dictMap)
-	pool.delDestFromPool(destLat,destLng,id,treeOfCities,dictMap)
-	return;
+	pool.delPickUpFromPool(pickupLat,pickupLng,int(id),treeOfCities,dictMap)
+	pool.delDestFromPool(destLat,destLng,int(id),treeOfCities,dictMap)
+	return "Successful";
 @app.route('/api/reCaP/v1/rider/',methods=['POST'])
 def getFromPool():
 	key=request.json["key"]["value"];
@@ -31,12 +32,15 @@ def getFromPool():
 	pickupLng=request.json["PickUp"]["Longitude"];
 	destLat=request.json["Destination"]["Latitude"];
 	destLng=request.json["Destination"]["Longitude"];
-	return json.dumps(pool.getFromPool(pickupLat,pickupLng,destLat,destLng,treeOfCities,dictMap))
+	jsonResult=pool.getFromPool(pickupLat,pickupLng,destLat,destLng,treeOfCities,dictMap)
+	phoneNumber=str(jsonResult["key"])
+	message="Please contact "+ str(key)+ ". The driver will pick you up at the specified location."
+	sms.sendSMS(phoneNumber,message)
+	return json.dumps(jsonResult)
 if __name__ == '__main__':
 	#Creating the dictionary of Cities
 	pool.createTreeOfCities(treeOfCities,dictMap)
-	app.run(host='0.0.0.0',port="9090")
-
+	app.run(host='localhost',port="9090")
 
 '''
 Request JSON structure:

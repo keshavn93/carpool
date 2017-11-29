@@ -282,7 +282,7 @@ class KDNode(Node):
         """ checks if self's point (and maybe identity) matches """
         if not self.data == point:
             return False
-
+        
         return (node is None) or (node is self)
 
 
