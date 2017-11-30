@@ -37,6 +37,10 @@ def getFromPool():
 		phoneNumber=str(jsonResult["key"])
 		message="Please contact "+ str(key)+ ". The driver will pick you up at the specified location."
 		sms.sendSMS(phoneNumber,message)
+		pickUpLat,pickUpLng,pickUpKey=jsonResult["pickup"]
+		pool.delPickUpFromPool(pickUpLat,pickUpLng,pickUpKey,treeOfCities,dictMap)
+		pickUpLat,pickUpLng,pickUpKey=jsonResult["dest"]
+		pool.delDestFromPool(pickUpLat,pickUpLng,pickUpKey,treeOfCities,dictMap)
 		return json.dumps(jsonResult)
 	except:
 		return "No matching found",status.HTTP_500_INTERNAL_SERVER_ERROR
