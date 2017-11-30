@@ -33,10 +33,13 @@ def getFromPool():
 	destLat=request.json["Destination"]["Latitude"];
 	destLng=request.json["Destination"]["Longitude"];
 	jsonResult=pool.getFromPool(pickupLat,pickupLng,destLat,destLng,treeOfCities,dictMap)
-	phoneNumber=str(jsonResult["key"])
-	message="Please contact "+ str(key)+ ". The driver will pick you up at the specified location."
-	sms.sendSMS(phoneNumber,message)
-	return json.dumps(jsonResult)
+	try:
+		phoneNumber=str(jsonResult["key"])
+		message="Please contact "+ str(key)+ ". The driver will pick you up at the specified location."
+		sms.sendSMS(phoneNumber,message)
+		return json.dumps(jsonResult)
+	except:
+		return "No matching found",status.HTTP_500_INTERNAL_SERVER_ERROR
 if __name__ == '__main__':
 	#Creating the dictionary of Cities
 	pool.createTreeOfCities(treeOfCities,dictMap)
