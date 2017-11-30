@@ -43,7 +43,7 @@ def getFromPool():
 if __name__ == '__main__':
 	#Creating the dictionary of Cities
 	pool.createTreeOfCities(treeOfCities,dictMap)
-	app.run(host='localhost',port="9090")
+	app.run(host='0.0.0.0',port="9090")
 
 '''
 Request JSON structure:
